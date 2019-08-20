@@ -13,15 +13,7 @@ class RoomRouter extends Component {
   async componentDidMount() {
     await this.connect()
     // await this.connect()
-    await this.state.socket.on(`currentPeers`, (msg, roomId, activePeers) => {
 
-			console.log(`newPeer`)
-			console.log(activePeers)
-
-			this.setState({
-				peers: activePeers
-			})
-		})
   }
 
   async connect (socket) {
@@ -33,17 +25,18 @@ class RoomRouter extends Component {
       // $txtConnection.innerHTML = 'Connected';
         // $fsPublish.disabled = false;
         // $fsSubscribe.disabled = false;
-        socket.emit('room', this.state.roomId, socket.id)
+
         console.log(`connected`)
         console.log(socket)
-
         const routerRtpCapabilities =
         await socket.request('getRouterRtpCapabilities')
+        await socket.emit('room', this.state.roomId)
 
         await this.setState({
           peer: socket,
           routerRtpCapabilities: routerRtpCapabilities
          })
+
       })
     socket.on('disconnect', () => {
         // $txtConnection.innerHTML = 'Disconnected';
@@ -54,6 +47,16 @@ class RoomRouter extends Component {
       })
     socket.on('newProducer', () => {
         // $fsSubscribe.disabled = false
+      })
+
+      socket.on(`currentPeers`, (msg, roomId, activePeers) => {
+
+        console.log(`newPeer`)
+        console.log(activePeers)
+
+        this.setState({
+          peers: activePeers
+        })
       })
   }
 
@@ -74,10 +77,14 @@ class RoomRouter extends Component {
         {
           this.state.routerRtpCapabilities ?
           this.state.peers.map((peer, index) => {
+            console.log(`map`)
+            console.log(this.state.peer)
             return (
               <Peer
                 key= { index }
                 routerCaps= { this.state.routerRtpCapabilities }
+                peerId= { peer.peerId  }
+                peer= { this.state.peer }
               />
             )
           }) : null

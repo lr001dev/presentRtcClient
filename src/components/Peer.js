@@ -4,15 +4,18 @@ import io    from 'socket.io-client'
 
 class Peer extends Component {
   state = {
-    socket: '',
-    router: this.props.routerCaps
+    peerId: this.props.peerId,
+    peer: this.props.peer,
+    router: this.props.routerCaps,
   }
 
   async componentDidMount() {
-    await this.setState({
-      router: this.props.routerCaps
-    })
-    
+    //   this.setState({
+    //   peerId: this.props.peerId,
+    //   peer: this.props.peer,
+    //   router: this.props.routerCaps
+    // })
+
     await this.loadPeerDevice(this.state.router)
   }
   async loadPeerDevice(routerRtpCapabilities) {
@@ -209,13 +212,29 @@ class Peer extends Component {
   }
 
   render() {
-    return(
-      <>
-      <h1>I'm Peer</h1>
-      <video id='rtc' autoPlay width='300px'></video>
-      <video id='rtc2' autoPlay width='300px'></video>
-    </>
-    )
+    if(this.state.peer) {
+      if(this.state.peerId == this.state.peer.id ) {
+        return (
+          <>
+          <h1>I'm Peer</h1>
+          <h1>{this.state.peerId}</h1>
+          <video id='rtc' autoPlay width='300px'></video>
+          <video id='rtc2' autoPlay width='300px'></video>
+          <button onClick={ () => { this.publish() } }>Enable Cam</button>
+          </>
+        )
+      } else {
+        return (
+          <>
+          <h1>I'm Peer</h1>
+          <h1>{this.state.peerId}</h1>
+          <video id='rtc' autoPlay width='300px'></video>
+          <video id='rtc2' autoPlay width='300px'></video>
+        </>
+        )
+      }
+    }
+
   }
 }
 export default Peer
