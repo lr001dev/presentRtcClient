@@ -58,6 +58,26 @@ class RoomRouter extends Component {
           peers: activePeers
         })
       })
+      socket.on(`deleteFromList`, (msg,peerId) => {
+
+  			console.log(peerId + ' ' + msg)
+  			let deletePeer = [...this.state.peers]
+
+  			const index = deletePeer.map(thePeer => thePeer.peerId).indexOf(peerId)
+  			deletePeer.splice(index, 1)
+
+  			this.setState({
+  				peers: [deletePeer]
+  			}, () => {
+  				console.log(`new clients array`)
+  				console.log(this.state.peers)
+  			})
+  			deletePeer.filter((thePeer) => {
+  				return thePeer.peerId === peerId
+  			})
+
+  			// alert(msg + 'at index' + index)
+  		})
   }
 
   socketPromise (socket) {

@@ -85,10 +85,12 @@ class Peer extends Component {
           break;
 
           case 'connected':
-          document.getElementById('rtc').srcObject = stream
+          document.getElementById(`${this.state.peerId}-local`).srcObject = stream
           // $txtPublish.innerHTML = 'published'
           // $fsPublish.disabled = true
           // $fsSubscribe.disabled = false
+          let subscribeButton = document.getElementById('cam')
+          subscribeButton.disabled = true
           break;
 
           case 'failed':
@@ -119,8 +121,8 @@ class Peer extends Component {
     let stream
     try {
       stream = isWebcam ?
-        await navigator.mediaDevices.getUserMedia({ video: true }) :
-        await navigator.mediaDevices.getDisplayMedia({ video: true })
+        await navigator.mediaDevices.getUserMedia({ video: true, audio: true }) :
+        await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true })
     } catch (err) {
       console.error('starting webcam failed,', err.message)
       throw err
@@ -165,13 +167,14 @@ class Peer extends Component {
         switch (state) {
           case 'connecting':
           // $txtSubscription.innerHTML = 'subscribing...'
-          // $fsSubscribe.disabled = true
           break;
 
           case 'connected':
-          document.getElementById('rtc2').srcObject = stream
+          document.getElementById(`${this.state.peerId}-remote`).srcObject = stream
           // $txtSubscription.innerHTML = 'subscribed'
           // $fsSubscribe.disabled = true
+          let subscribeButton = document.getElementById('sub')
+          subscribeButton.disabled = true
           break;
 
           case 'failed':
@@ -218,9 +221,9 @@ class Peer extends Component {
           <>
           <h1>I'm Peer</h1>
           <h1>{this.state.peerId}</h1>
-          <video id='rtc' autoPlay width='300px'></video>
-          <video id='rtc2' autoPlay width='300px'></video>
-          <button onClick={ () => { this.publish() } }>Enable Cam</button>
+          <video id={ `${this.state.peerId}-local` } autoPlay width='300px'></video>
+          <video id={ `${this.state.peerId}-remote` } autoPlay width='300px'></video>
+          <button id='cam' onClick={ () => { this.publish() } }>Enable Cam</button>
           </>
         )
       } else {
@@ -228,8 +231,8 @@ class Peer extends Component {
           <>
           <h1>I'm Peer</h1>
           <h1>{this.state.peerId}</h1>
-          <video id='rtc' autoPlay width='300px'></video>
-          <video id='rtc2' autoPlay width='300px'></video>
+          <video id={ `${this.state.peerId}-remote` } autoPlay width='300px'></video>
+          <button id='sub' onClick={ () => { this.subscribe() } }>Subscribe</button>
         </>
         )
       }
