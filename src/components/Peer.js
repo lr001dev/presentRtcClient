@@ -9,16 +9,18 @@ class Peer extends Component {
     router: this.props.routerCaps,
   }
 
+  // componentDidUpdate (prevProps) {
+  //   if (this.props !== prevProps) {
+  //     let newProps = this.props
+  //     this.setState({ state: newProps })
+  //     }
+  //   }
   async componentDidMount() {
-    //   this.setState({
-    //   peerId: this.props.peerId,
-    //   peer: this.props.peer,
-    //   router: this.props.routerCaps
-    // })
-
     await this.loadPeerDevice(this.state.router)
+    // await this.publish()
+    // await this.subscribe()
   }
-  async loadPeerDevice(routerRtpCapabilities) {
+  loadPeerDevice = async (routerRtpCapabilities) => {
     const peerDevice = await new Device()
     try {
         // peerDevice = await new Device()
@@ -32,11 +34,11 @@ class Peer extends Component {
         await this.setState({
           peerDevice: peerDevice
         })
-        await console.log(`peer device`)
-        await console.log(this.state.peerDevice)
+        // await console.log(`peer device`)
+        // await console.log(this.state.peerDevice)
   }
 
-  async publish(e) {
+   publish = async (e) => {
     // const isWebcam = (e.target.id === 'btn_webcam')
     const isWebcam = true
     // $txtPublish = isWebcam ? $txtWebcam : $txtScreen
@@ -50,10 +52,10 @@ class Peer extends Component {
       console.error(data.error)
       return
     }
-    await console.log (`producer transport`)
-    await console.log (data)
-    console.log(`state`)
-    console.log(this.state)
+    // await console.log (`producer transport`)
+    // await console.log (data)
+    // console.log(`state`)
+    // console.log(this.state)
 
     const transport = this.state.peerDevice.createSendTransport(data)
 
@@ -112,7 +114,7 @@ class Peer extends Component {
       }
   }
 
-  async getUserMedia(transport, isWebcam, producer) {
+  getUserMedia = async (transport, isWebcam, producer) => {
     if (!this.state.peerDevice.canProduce('video')) {
       console.error('cannot produce video')
       return
@@ -141,98 +143,118 @@ class Peer extends Component {
       };
     }
     producer = await transport.produce(params)
+    await this.props.autoSubscribe(this.state.peer, this.state.peerDevice, this.state.peerId)
     return stream
   }
 
-  async subscribe() {
-    const data = await this.state.peer.request('createConsumerTransport', {
-      forceTcp: false,
-    });
-    if (data.error) {
-    console.error(data.error)
-      return;
-    }
+  // async subscribe() {
+  //   const data = await this.state.peer.request('createConsumerTransport', {
+  //     forceTcp: false,
+  //   });
+  //   if (data.error) {
+  //   console.error(data.error)
+  //     return;
+  //   }
+  //
+  //   const transport = this.state.peerDevice.createRecvTransport(data);
+  //   transport.on('connect', ({ dtlsParameters }, callback, errback) => {
+  //     this.state.peer.request('connectConsumerTransport', {
+  //       transportId: transport.id,
+  //       dtlsParameters
+  //     })
+  //       .then(callback)
+  //       .catch(errback)
+  //     })
+  //
+  //     transport.on('connectionstatechange', (state) => {
+  //       switch (state) {
+  //         case 'connecting':
+  //         // $txtSubscription.innerHTML = 'subscribing...'
+  //         break;
+  //
+  //         case 'connected':
+  //         document.getElementById(`${this.state.peerId}-remote`).srcObject = stream
+  //         // $txtSubscription.innerHTML = 'subscribed'
+  //         // $fsSubscribe.disabled = true
+  //         let subscribeButton = document.getElementById('sub')
+  //         subscribeButton.disabled = true
+  //         break;
+  //
+  //         case 'failed':
+  //         transport.close()
+  //         // $txtSubscription.innerHTML = 'failed'
+  //         // $fsSubscribe.disabled = false
+  //         break;
+  //
+  //         default: break;
+  //       }
+  //     })
+  //
+  //     const stream = await this.consume(transport)
+  //     this.state.peer.request('resume')
+  // }
+  //
+  // async consume(transport) {
+  //   const { rtpCapabilities } = this.state.peerDevice
+  //   const data = await this.state.peer.request('consume', { rtpCapabilities })
+  //   const {
+  //     producerId,
+  //     id,
+  //     kind,
+  //     rtpParameters,
+  //   } = data
+  //
+  //   let codecOptions = {};
+  //   const consumer = await transport.consume({
+  //     id,
+  //     producerId,
+  //     kind,
+  //     rtpParameters,
+  //     codecOptions,
+  //   });
+  //   const stream = new MediaStream()
+  //   stream.addTrack(consumer.track)
+  //   return stream
+  // }
 
-    const transport = this.state.peerDevice.createRecvTransport(data);
-    transport.on('connect', ({ dtlsParameters }, callback, errback) => {
-      this.state.peer.request('connectConsumerTransport', {
-        transportId: transport.id,
-        dtlsParameters
-      })
-        .then(callback)
-        .catch(errback)
-      })
+  componentWillUnmount() {
 
-      transport.on('connectionstatechange', (state) => {
-        switch (state) {
-          case 'connecting':
-          // $txtSubscription.innerHTML = 'subscribing...'
-          break;
+		// const video = document.getElementById(`${this.state.peerId}-local`)
+		// let localStream = video.srcObject
+		// let tracks = localStream.getTracks()
+    //
+		// tracks.forEach(function(track) {
+	 	// 	track.stop()
+ 		// })
+    //
+ 		// video.srcObject = null
 
-          case 'connected':
-          document.getElementById(`${this.state.peerId}-remote`).srcObject = stream
-          // $txtSubscription.innerHTML = 'subscribed'
-          // $fsSubscribe.disabled = true
-          let subscribeButton = document.getElementById('sub')
-          subscribeButton.disabled = true
-          break;
-
-          case 'failed':
-          transport.close()
-          // $txtSubscription.innerHTML = 'failed'
-          // $fsSubscribe.disabled = false
-          break;
-
-          default: break;
-        }
-      })
-
-      const stream = await this.consume(transport)
-      this.state.peer.request('resume')
-  }
-
-  async consume(transport) {
-    const { rtpCapabilities } = this.state.peerDevice
-    const data = await this.state.peer.request('consume', { rtpCapabilities })
-    const {
-      producerId,
-      id,
-      kind,
-      rtpParameters,
-    } = data
-
-    let codecOptions = {};
-    const consumer = await transport.consume({
-      id,
-      producerId,
-      kind,
-      rtpParameters,
-      codecOptions,
-    });
-    const stream = new MediaStream()
-    stream.addTrack(consumer.track)
-    return stream
-  }
+		this.state.peer.disconnect(true)
+	}
 
   render() {
     if(this.state.peer) {
-      if(this.state.peerId == this.state.peer.id ) {
+      if(this.state.peerId === this.state.peer.id ) {
         return (
           <>
-          <h1>I'm Peer</h1>
+          <h1>I'm Local Peer</h1>
           <h1>{this.state.peerId}</h1>
           <video id={ `${this.state.peerId}-local` } autoPlay width='300px'></video>
-          <video id={ `${this.state.peerId}-remote` } autoPlay width='300px'></video>
           <button id='cam' onClick={ () => { this.publish() } }>Enable Cam</button>
           </>
         )
       } else {
         return (
           <>
-          <h1>I'm Peer</h1>
+          <h1>I'm Remote Peer</h1>
           <h1>{this.state.peerId}</h1>
-          <video id={ `${this.state.peerId}-remote` } autoPlay width='300px'></video>
-          <button id='sub' onClick={ () => { this.subscribe() } }>Subscribe</button>
+          <video id={ `${this.state.peerId}-remote`} autoPlay width='300px'></video>
+          {
+            this.state.peer &&
+            <button id={ `${this.state.peerId}-sub` } onClick={ () => { this.props.subscribe(this.state.peer, this.state.peerDevice, this.state.peerId) } }>Subscribe</button>
+
+          }
+
         </>
         )
       }
