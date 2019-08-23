@@ -31,9 +31,9 @@ class Peer extends Component {
           }
         }
         await peerDevice.load({routerRtpCapabilities})
-        await this.setState({
-          peerDevice: peerDevice
-        })
+        // await this.setState({
+        //   peerDevice: peerDevice
+        // })
         // await console.log(`peer device`)
         // await console.log(this.state.peerDevice)
   }

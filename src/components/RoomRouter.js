@@ -40,8 +40,14 @@ class RoomRouter extends Component {
         // $fsSubscribe.disabled = true;
         console.log(`disconnected`)
       })
-    socket.on('newProducer', () => {
+    socket.on(`newProducer`, (msg, activePeers) => {
         // $fsSubscribe.disabled = false
+        if(this.state.peers.length > 0){
+          this.setState({
+            peers: activePeers
+           })
+           console.log(activePeers)
+        }
       })
 
       socket.on(`currentPeers`, async (msg, roomId, activePeers, peerId) => {
@@ -117,7 +123,8 @@ class RoomRouter extends Component {
         // await console.log(`peer device`)
         // await console.log(this.state.peerDevice)
   }
-  publish = async (peerDevice) => {
+  publish = async (peerDevice, peerIndex, roomId) => {
+    console.log(`peer index ${peerIndex}`)
     const isWebcam = true
 
     const data = await this.state.peer.request('createProducerTransport', {
@@ -139,12 +146,14 @@ class RoomRouter extends Component {
       .catch(errback)
     })
 
-    transport.on('produce', async ({ kind, rtpParameters }, callback, errback) => {
+    transport.on('produce', async ({ kind, rtpParameters } ,callback, errback) => {
       try {
         const { id } = await this.state.peer.request('produce', {
           transportId: transport.id,
           kind,
           rtpParameters,
+          peerIndex,
+          roomId
         })
         callback({ id })
       } catch (err) {
@@ -164,6 +173,7 @@ class RoomRouter extends Component {
           console.log(`video object`)
           console.log(document.getElementById(`${this.state.peerId}-local`))
           document.getElementById(`${this.state.peerId}-local`).srcObject = stream
+          // this.state.peer.on(`publishVideo`, peerIndex)
              // $txtPublish.innerHTML = 'published'
              // $fsPublish.disabled = true
              // $fsSubscribe.disabled = false
@@ -184,12 +194,12 @@ class RoomRouter extends Component {
 
       let stream
       try {
-        stream = await this.getUserMedia(peerDevice, transport, isWebcam)
+        stream = await this.getUserMedia(peerDevice, peerIndex, transport, isWebcam)
       } catch (err) {
            // $txtPublish.innerHTML = 'failed'
       }
   }
-  getUserMedia = async (peerDevice, transport, isWebcam, producer) => {
+  getUserMedia = async (peerDevice, peerIndex, transport, isWebcam, producer) => {
     if (!peerDevice.canProduce('video')) {
       console.error('cannot produce video')
       return
@@ -245,7 +255,7 @@ class RoomRouter extends Component {
     // await console.log(this.state.producers)
   }
 
-  subscribe = async (peer, peerDevice, peerId) => {
+  subscribe = async (peer, peerDevice, peerId, producer) => {
     console.log(`subscribing data`)
     // console.log(peer)
     // console.log(peerDevice)
@@ -295,13 +305,16 @@ class RoomRouter extends Component {
         }
       })
 
-      const stream = await this.consume(transport, peer, peerDevice)
+      const stream = await this.consume(transport, peer, peerDevice,producer)
       peer.request('resume')
   }
 
-  consume = async (transport, peer, peerDevice) => {
+  consume = async (transport, peer, peerDevice, producer) => {
+    let prodId = {
+      id: producer
+    }
     const { rtpCapabilities } = peerDevice
-    const data = await peer.request('consume', { rtpCapabilities })
+    const data = await peer.request('consume', { prodId, rtpCapabilities })
     const {
       producerId,
       id,
@@ -324,17 +337,17 @@ class RoomRouter extends Component {
 
   componentWillUnmount() {
 
-		const video = document.getElementById(`${this.state.peerId}-local`)
-		let localStream = video.srcObject
-		let tracks = localStream.getTracks()
-
-		tracks.forEach(function(track) {
-	 		track.stop()
- 		})
-
- 		video.srcObject = null
-
-		this.state.peer.close()
+		// const video = document.getElementById(`${this.state.peerId}-local`)
+		// let localStream = video.srcObject
+		// let tracks = localStream.getTracks()
+    //
+		// tracks.forEach(function(track) {
+	 	// 	track.stop()
+ 		// })
+    //
+ 		// video.srcObject = null
+    //
+		// this.state.peer.close()
 	}
   render() {
     if(this.state.peers.length !== 0 ) {
@@ -348,7 +361,7 @@ class RoomRouter extends Component {
                     <h1>I'm Local Peer</h1>
                     <h1>{ peer.peerId }</h1>
                     <video id={ `${ peer.peerId }-local` } autoPlay width='300px'></video>
-                    <button key= { index } id='cam' onClick={ () => { this.publish(this.state.peerDevice) } }>Enable Cam</button>
+                    <button key= { index } id='cam' onClick={ () => { this.publish(this.state.peerDevice, index, this.state.roomId) } }>Enable Cam</button>
                   </div>
                 </>
                   )
@@ -359,7 +372,7 @@ class RoomRouter extends Component {
                     <h1>I'm Remote Peer</h1>
                     <h1>{ peer.peerId }</h1>
                     <video id={ `${ peer.peerId }-remote`} autoPlay width='300px'></video>
-                    <button id={ `${ peer.peerId }-sub` } onClick={ () => { this.subscribe(this.state.peer, this.state.peerDevice, peer.peerId) } }>Subscribe</button>
+                    <button id={ `${ peer.peerId }-sub` } onClick={ () => { this.subscribe(this.state.peer, this.state.peerDevice, peer.peerId, peer.producerId) } }>Subscribe</button>
                   </div>
                 </>
               )
