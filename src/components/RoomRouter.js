@@ -9,7 +9,7 @@ class RoomRouter extends Component {
   state = {
     roomId: '1',
     peers: [],
-    socket: io('https://localhost:3002'),
+    socket: io('https://presentrtc-api.herokuapp.com'),
     producers: []
   }
 
