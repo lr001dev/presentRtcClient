@@ -10,7 +10,7 @@ class RoomRouter extends Component {
   state = {
     roomId: '1',
     peers: [],
-    socket: io('https://localhost:3002'),
+    socket: io('https://localhost:3003'),
     producers: []
   }
 

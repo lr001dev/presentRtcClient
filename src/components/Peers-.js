@@ -263,4 +263,64 @@ render() {
 
 export default Peers
 
-      
+      <Col sm>
+      <CardDeck>
+        <Card key={ index } style={{ width: '18rem' }}>
+          <Card.Img variant="top" src="" />
+          <Card.Body>
+            <Card.Title>{ peer.peerId }</Card.Title>
+            <Card.Text>
+              I'm Remote Peer
+            </Card.Text>
+            <video id={ `${ peer.peerId }-remote`} autoPlay width='300px'></video>
+          </Card.Body>
+          <ListGroup className="list-group-flush">
+            <ListGroupItem>
+              <Button
+                id={ `${ peer.peerId }-sub` }
+                onClick={ () => {
+                    this.subscribe(this.state.peer, this.state.peerDevice, peer.peerId, peer.producerId)
+                  } }
+                variant="outline-success">Subscribe</Button>
+            </ListGroupItem>
+          </ListGroup>
+        </Card>
+        </CardDeck>
+
+      </Col>
+
+    }
+      <Container>
+        <CardDeck>
+      {
+        this.state.peers.map((peer, index) => {
+          if(peer.peerId !== this.state.peer.Id && peer.peerId !== this.state.pee) {
+            return(
+              <Col  sm>
+                  <Card style={{ width: '18rem' }}>
+                    <Card.Img variant="top" src="" />
+                    <Card.Body>
+                      <Card.Title>{ peer.peerId }</Card.Title>
+                      <Card.Text>
+                        I'm Remote Peer
+                      </Card.Text>
+                      <video id={ `${ peer.peerId }-remote`} autoPlay width='300px'></video>
+                    </Card.Body>
+                    <ListGroup className="list-group-flush">
+                      <ListGroupItem>
+                        <Button
+                          id={ `${ peer.peerId }-sub` }
+                          onClick={ () => {
+                              this.subscribe(this.state.peer, this.state.peerDevice, peer.peerId, peer.producerId)
+                            } }
+                          variant="outline-success">Subscribe</Button>
+                      </ListGroupItem>
+                    </ListGroup>
+                  </Card>
+              </Col>
+            )
+          }
+        })
+      }
+        </CardDeck>
+      </Container>
