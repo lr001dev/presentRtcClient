@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import io from 'socket.io-client'
 import { Device } from 'mediasoup-client'
-import NewPeer from './NewPeer'
+// import NewPeer from './NewPeer'
 import Peer from './Peer'
 
 

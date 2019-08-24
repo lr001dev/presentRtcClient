@@ -1,4 +1,4 @@
-body {
+/* body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
@@ -10,4 +10,39 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+} */
+body {
+  margin: 0;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+
+  background-image: linear-gradient(to top, #09203f 0%, #537895 100%);
+}
+.sidenav---sidenav---_2tBP {
+  background: #a4c7f2 !important;
+}
+h1 {
+  color: white;
+}
+.update, .peers, .community {
+  margin-top: 5em;
+}
+.profile-container {
+  margin-top: 2em;
+}
+.profile-table {
+  margin-top: 3em;
+  background-color: white;
+  border-radius: 1em;
+}
+.update-form, .create-form {
+  margin-top: 2em;
+  margin-bottom: 5em;
+  padding: 2em;
+  background-color: white;
+  border-radius: 1em;
+}
+.home-nav > button {
+  margin-right: 1em;
 }

@@ -3,13 +3,14 @@ import io from 'socket.io-client'
 import { Device } from 'mediasoup-client'
 import Peers from './Peers'
 import Peer from './Peer'
+import { Container, Row, CardDeck, Col, Card, ListGroup, ListGroupItem, Form, Button } from 'react-bootstrap'
 
 
 class RoomRouter extends Component {
   state = {
     roomId: '1',
     peers: [],
-    socket: io('https://presentrtc-api.herokuapp.com'),
+    socket: io('https://localhost:3002'),
     producers: []
   }
 
@@ -177,7 +178,7 @@ class RoomRouter extends Component {
              // $txtPublish.innerHTML = 'published'
              // $fsPublish.disabled = true
              // $fsSubscribe.disabled = false
-          let subscribeButton = document.getElementById('cam')
+          let subscribeButton = document.getElementById(`${this.state.peerId}-cam`)
           subscribeButton.disabled = true
           break;
 
@@ -353,34 +354,74 @@ class RoomRouter extends Component {
     if(this.state.peers.length !== 0 ) {
 
         return (
-          this.state.peers.map((peer, index) => {
-            if(peer.peerId === this.state.peer.id) {
-              return (
-                <>
-                  <div key={ index }>
-                    <h1>I'm Local Peer</h1>
-                    <h1>{ peer.peerId }</h1>
-                    <video id={ `${ peer.peerId }-local` } autoPlay width='300px'></video>
-                    <button key= { index } id='cam' onClick={ () => { this.publish(this.state.peerDevice, index, this.state.roomId) } }>Enable Cam</button>
-                  </div>
-                </>
+          <>
+          {
+            this.state.peers.map((peer, index) => {
+              if(peer.peerId === this.state.peer.id) {
+                return (
+                    <>
+                      <Container key={peer.peerId} >
+                        <Card key={ index } style={{ width: '30rem' }}>
+                          <Card.Img variant="top" src="" />
+                          <Card.Body>
+                            <video id={ `${ peer.peerId }-local` } autoPlay width='300px'></video>
+                            <Card.Title>{ peer.peerId }</Card.Title>
+                            <Card.Text>
+                            I'm Local Peer
+                            </Card.Text>
+                          </Card.Body>
+                          <ListGroup className="list-group-flush">
+                            <ListGroupItem>
+                              <Button
+                                id={ `${ peer.peerId }-cam` }
+                                onClick={ () => { this.publish(this.state.peerDevice, index, this.state.roomId) } }
+                                variant="outline-success">Enable</Button>
+                              </ListGroupItem>
+                          </ListGroup>
+                        </Card>
+                    </Container>
+                  </>
+                )
+              }
+            })
+          }
+            <Container>
+              <CardDeck>
+            {
+              this.state.peers.map((peer, index) => {
+                if(peer.peerId !== this.state.peer.id) {
+                  return(
+                    <Col  sm>
+                        <Card style={{ width: '18rem' }}>
+                          <Card.Img variant="top" src="" />
+                          <Card.Body>
+                            <video id={ `${ peer.peerId }-remote`} autoPlay width='300px'></video>
+                            <Card.Title>{ peer.peerId }</Card.Title>
+                            <Card.Text>
+                              I'm Remote Peer
+                            </Card.Text>
+                          </Card.Body>
+                          <ListGroup className="list-group-flush">
+                            <ListGroupItem>
+                              <Button
+                                id={ `${ peer.peerId }-sub` }
+                                onClick={ () => {
+                                    this.subscribe(this.state.peer, this.state.peerDevice, peer.peerId, peer.producerId)
+                                  } }
+                                variant="outline-success">Subscribe</Button>
+                            </ListGroupItem>
+                          </ListGroup>
+                        </Card>
+                    </Col>
                   )
-            } else {
-              return(
-                <>
-                  <div key={ index }>
-                    <h1>I'm Remote Peer</h1>
-                    <h1>{ peer.peerId }</h1>
-                    <video id={ `${ peer.peerId }-remote`} autoPlay width='300px'></video>
-                    <button id={ `${ peer.peerId }-sub` } onClick={ () => { this.subscribe(this.state.peer, this.state.peerDevice, peer.peerId, peer.producerId) } }>Subscribe</button>
-                  </div>
-                </>
-              )
+                }
+              })
             }
-          })
-            )
-
-          } else {
+              </CardDeck>
+            </Container>
+          </>
+        )
+      } else {
             return(
               <h1>Nada</h1>
             )
