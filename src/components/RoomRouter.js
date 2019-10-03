@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import io from 'socket.io-client'
 import { Device } from 'mediasoup-client'
-import Peers from './Peers'
-import Peer from './Peer'
-import { Container, Row, CardDeck, Col, Card, ListGroup, ListGroupItem, Form, Button } from 'react-bootstrap'
+// import Peers from './Peers'
+// import Peer from './Peer'
+import { Container, CardDeck, Col, Card, ListGroup, ListGroupItem, Button } from 'react-bootstrap'
 
 
 class RoomRouter extends Component {
@@ -395,7 +395,7 @@ class RoomRouter extends Component {
               this.state.peers.map((peer, index) => {
                 if(peer.peerId !== this.state.peer.id) {
                   return(
-                    <Col  sm>
+                    <Col key={peer.peerId} sm>
                         <Card style={{ width: '18rem' }}>
                           <Card.Img variant="top" src="" />
                           <Card.Body>
