@@ -10,7 +10,7 @@ import '@trendmicro/react-sidenav/dist/react-sidenav.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faUsers, faCalendarWeek } from '@fortawesome/free-solid-svg-icons'
 
-class Dashboard extends React.Component {
+class Dashboard extends Component {
   state = {
 
     sessions: '',

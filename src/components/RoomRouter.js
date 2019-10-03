@@ -10,7 +10,7 @@ class RoomRouter extends Component {
   state = {
     roomId: '1',
     peers: [],
-    socket: io('https://rtcapi.luisrosaio.io:3003'),
+    socket: io('https://localhost:3003'),
     producers: []
   }
 
@@ -382,6 +382,10 @@ class RoomRouter extends Component {
                     </Container>
                   </>
                 )
+              } else {
+                  return(
+                    <></>
+                  )
               }
             })
           }
@@ -414,6 +418,10 @@ class RoomRouter extends Component {
                         </Card>
                     </Col>
                   )
+                } else {
+                    return(
+                      <></>
+                    )
                 }
               })
             }
